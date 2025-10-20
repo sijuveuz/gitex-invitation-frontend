@@ -3,6 +3,8 @@ import Modal from "react-modal";
 import Select from "react-select";
 import { MdSend, MdClose, MdEmail } from "react-icons/md";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const PersonalizedModal = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -38,7 +40,7 @@ const PersonalizedModal = ({ isOpen, onClose, onSubmit }) => {
       try {
         setLoadingTickets(true);
         const token = localStorage.getItem("token");
-        const res = await fetch("${API_URL}/api/invitations/tickets/", {
+        const res = await fetch(`${API_URL}/api/invitations/tickets/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

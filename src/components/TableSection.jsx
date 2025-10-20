@@ -21,10 +21,12 @@ import EditHandler from "./Modals/EditHandler";
 import BroadcastModal from "./Modals/BroadcastModal";
 const MySwal = withReactContent(Swal);
 
+
+const API_URL = process.env.REACT_APP_API_URL;
+
 const CopyButton = ({ url }) => {
   const [copied, setCopied] = useState(false);
 
-  const API_URL = process.env.REACT_APP_API_URL;
   const handleCopy = async () => {
     if (!url) {
       MySwal.fire('Error', 'No URL found to copy', 'error');

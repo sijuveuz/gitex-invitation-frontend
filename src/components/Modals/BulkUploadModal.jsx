@@ -6,7 +6,7 @@ import { MdAdd, MdClose, MdSend } from "react-icons/md";
 import withReactContent from "sweetalert2-react-content";
 import AddRowModal from "./AddRowModal";
 const MySwal = withReactContent(Swal);
-
+const API_URL = process.env.REACT_APP_API_URL; 
 const BulkPersonalizedModal = ({ isOpen, onClose }) => {
   const [defaultMessage, setDefaultMessage] = useState("");
   const [expireDate, setExpireDate] = useState("");
@@ -35,7 +35,7 @@ const BulkPersonalizedModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     const fetchTicketTypes = async () => {
       try {
-        const res = await axios.get("${API_URL}/api/invitations/tickets/", {
+        const res = await axios.get(`${API_URL}/api/invitations/tickets/`, {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
         console.log("TICKETS API", res.data);
@@ -290,7 +290,7 @@ const BulkPersonalizedModal = ({ isOpen, onClose }) => {
     try {
       setUploading(true);
       const res = await axios.post(
-        "${API_URL}/api/invitations/bulk/upload/",
+        `${API_URL}/api/invitations/bulk/upload/`,
         fd,
         {
           headers: {

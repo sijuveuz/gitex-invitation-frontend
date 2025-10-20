@@ -21,8 +21,9 @@ const FilterSection = ({ onFilter, onReset }) => {
   const timeoutRef = useRef(null);
   const pollingRef = useRef(null);
 
-  const API_BASE = "${API_URL}/api/invitations";
-  const FILE_BASE = "${API_URL}";
+
+  const API_BASE = `${API_URL}/api/invitations`;
+  const FILE_BASE = `${API_URL}`;
 
   const statusOptions = [
     { value: "active", label: "Active" },
@@ -138,7 +139,7 @@ const FilterSection = ({ onFilter, onReset }) => {
           try {
             const token = localStorage.getItem("token");
             const { data } = await axios.post(
-              "${API_URL}/api/invitations/exports/request/",
+              `${API_URL}/api/invitations/exports/request/`,
               { format }, // <-- body
               {
                 headers: {

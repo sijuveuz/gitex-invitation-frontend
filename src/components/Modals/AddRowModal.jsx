@@ -29,7 +29,7 @@ const AddRowModal = ({ isOpen, onClose, jobId, onRowAdded }) => {
     const fetchTickets = async () => {
       try {
         setLoadingTickets(true);
-        const res = await axios.get("${API_URL}/api/invitations/tickets/",{
+        const res = await axios.get(`${API_URL}/api/invitations/tickets/`,{
             headers: { Authorization: token ? `Bearer ${token}` : "" },
       });
         if (res.data.status === "success") {

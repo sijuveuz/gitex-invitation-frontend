@@ -16,7 +16,6 @@ const InviteConfirm = () => {
   const [error, setError] = useState(null);
   const [isEditable, setIsEditable] = useState(false);
   const MySwal = withReactContent(Swal);
-  const API_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
     const fetchInvite = async () => {
       try {

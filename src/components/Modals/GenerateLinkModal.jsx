@@ -7,7 +7,6 @@ import withReactContent from "sweetalert2-react-content";
 const API_URL = process.env.REACT_APP_API_URL;
 
 const MySwal = withReactContent(Swal);
-const API_URL = process.env.REACT_APP_API_URL;
 const GenerateLinkModal = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     linkTitle: "",
@@ -29,7 +28,6 @@ const GenerateLinkModal = ({ isOpen, onClose, onSubmit }) => {
       setErrors({}); // Clear errors on open
     }
   }, [isOpen]);
-  const API_URL = process.env.REACT_APP_API_URL;
   // Fetch tickets from backend
   const fetchTickets = async () => {
     setLoadingTickets(true);

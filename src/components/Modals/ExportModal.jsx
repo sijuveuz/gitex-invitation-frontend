@@ -19,7 +19,7 @@ const ExportModal = () => {
 
     try {
       const response = await axios.post(
-        "${API_URL}/api/invitations/exports/request/",
+        `${API_URL}/api/invitations/exports/request/`,
         { format: selectedFormat },
         { headers: { "Content-Type": "application/json" } }
       );

@@ -19,6 +19,7 @@ import BulkUploadModal from './components/Modals/BulkUploadModal';
 import InviteConfirm from './pages/InviteConfirm';
 import InviteRegister from './pages/InviteRegister';
 
+
 const MySwal = withReactContent(Swal); 
 const API_URL = process.env.REACT_APP_API_URL;
 // ✅ Extract MainContent outside to prevent re-mounting
@@ -137,7 +138,7 @@ const MainContent = ({
             const token = localStorage.getItem('token');
             try {
               const res = await axios.post(
-                '${API_URL}/api/invitations/send/',
+                `${API_URL}/api/invitations/send/`,
                 {
                   guest_name: formData.name,
                   guest_email: formData.guest_email,
@@ -259,7 +260,7 @@ function App() {
   const fetchStats = useCallback(async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await axios.get('${API_URL}/api/invitations/stats/', {
+      const res = await axios.get(`${API_URL}/api/invitations/stats/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data?.status === 'success' && res.data?.data) {
