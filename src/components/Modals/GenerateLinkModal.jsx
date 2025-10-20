@@ -33,7 +33,7 @@ const GenerateLinkModal = ({ isOpen, onClose, onSubmit }) => {
     setLoadingTickets(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("${API_URL}/api/invitations/tickets/", {
+      const res = await axios.get(`${API_URL}/api/invitations/tickets/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -170,7 +170,7 @@ const GenerateLinkModal = ({ isOpen, onClose, onSubmit }) => {
       setSubmitting(true);
 
       const res = await axios.post(
-        "${API_URL}/api/invitations/generate-link/",
+        `${API_URL}/api/invitations/generate-link/`,
         {
           guest_name: linkTitle, // Backend expects guest_name
           expire_date,
