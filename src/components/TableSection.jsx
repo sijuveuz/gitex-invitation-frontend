@@ -472,7 +472,7 @@ const TableSection = ({
               const token = localStorage.getItem('token');
               try {
                 const res = await axios.post(
-                  '${API_URL}/api/invitations/broadcast/',
+                  `${API_URL}/api/invitations/broadcast/`,
                   {
                     invitation_id: selectedBroadcastId,
                     source_type: "link",
@@ -483,7 +483,7 @@ const TableSection = ({
                   },
                   { headers: { Authorization: `Bearer ${token}` } }
                 );
-
+                console.log(res.data)
                 if (res.data?.status === 'success') {
                   return res.data;
                 }

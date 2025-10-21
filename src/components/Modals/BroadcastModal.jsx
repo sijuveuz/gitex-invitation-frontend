@@ -88,8 +88,10 @@ const BroadcastModal = ({ isOpen, onClose, invitationId, onSubmit, onSuccess }) 
     setGeneralError(null);
     setLoading(true);
     const result = await onSubmit(formData);
+    console.log("Result",result)
     setLoading(false);
     if (result?.status === "error") {
+      console.log("Error",result)
       setGeneralError(result.message || "Something went wrong.");
     } else if (result?.status === "success") {
       onSuccess();
