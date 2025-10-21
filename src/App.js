@@ -170,9 +170,15 @@ const MainContent = ({
         <BulkUploadModal
           isOpen={isBulkModalOpen}
           onClose={() => setIsBulkModalOpen(false)}
+
           onSubmit={(data) => {
             MySwal.fire('Sent!', `${data.length} invitations sent.`, 'success');
             // Refresh list after bulk send
+            fetchInvitations(currentPage, currentFilters);
+            fetchStats();
+          }}
+          onSuccess={() => {
+            // ✅ Refresh after success, same as PersonalizedModal
             fetchInvitations(currentPage, currentFilters);
             fetchStats();
           }}
@@ -325,7 +331,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
         <Route
           path="/"
           element={

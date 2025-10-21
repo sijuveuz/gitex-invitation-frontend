@@ -183,7 +183,15 @@ const InviteConfirm = () => {
                   className="border p-2 w-full rounded-lg bg-gray-100"
                 />
               </div>
-
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">Ticket Class</label>
+                <input
+                  type="text"
+                  value={inviteData.ticket_type.name} 
+                  disabled
+                  className="border p-2 w-full rounded-lg bg-gray-100"
+                />
+              </div>
               <div>
                 <label className="block text-sm text-gray-700 mb-1">
                   Guest Name {isEditable && '*'}

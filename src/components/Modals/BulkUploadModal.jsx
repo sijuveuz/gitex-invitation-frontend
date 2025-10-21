@@ -5,9 +5,13 @@ import Swal from "sweetalert2";
 import { MdAdd, MdClose, MdSend } from "react-icons/md";
 import withReactContent from "sweetalert2-react-content";
 import AddRowModal from "./AddRowModal";
+
+
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.REACT_APP_API_URL; 
-const BulkPersonalizedModal = ({ isOpen, onClose }) => {
+
+
+const BulkPersonalizedModal = ({ isOpen, onClose, onSuccess  }) => {
   const [defaultMessage, setDefaultMessage] = useState("");
   const [expireDate, setExpireDate] = useState("");
   const [rows, setRows] = useState([]);
@@ -421,6 +425,14 @@ const BulkPersonalizedModal = ({ isOpen, onClose }) => {
       }
       if (res.data.status === "success") {
         MySwal.fire("Success", "Invitations sent successfully!", "success");
+        if (onSuccess) {
+          let attempts = 0;
+          const pollStats = setInterval(async () => {
+            await onSuccess(); // calls fetchStats
+            attempts++;
+            if (attempts >= 5) clearInterval(pollStats); // stop after 5 tries (~5s)
+          }, 1000);
+        }
         onClose();
       } else {
         MySwal.fire(

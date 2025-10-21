@@ -103,10 +103,11 @@ const InviteRegister = () => {
           link_code: uuid, // 🔹 include the UUID here
         }
       );
-  
+      console.log(res.data)
       MySwal.fire("🎉 Registered!", "You’ve successfully registered!", "success");
       navigate("/");
     } catch (err) {
+      console.log(err.response)
       const detail = err.response?.data?.detail;
       setGeneralError(detail || "Registration failed.");
     } finally {

@@ -22,7 +22,7 @@ const Login = ({ setIsAuthenticated }) => {
       setIsAuthenticated(true);
       MySwal.fire('Logged in!', 'Welcome back.', 'success');
 
-      navigate('/invitation');
+      navigate('/invitation'); 
     } catch (err) {
       console.log("EEEE", err.response?.data);
       MySwal.fire('Error', err.response?.data?.error || 'Invalid credentials ', 'error');
@@ -54,9 +54,9 @@ const Login = ({ setIsAuthenticated }) => {
           </div>
           <button type="submit" className="bg-primary text-white p-2 w-full rounded">Login</button>
         </form>
-        {/* <p className="text-center mt-4 text-sm">
+        <p className="text-center mt-4 text-sm">
           No account? <a href="/register" className="text-primary">Register</a>
-        </p> */}
+        </p>
       </div>
     </div>
   );

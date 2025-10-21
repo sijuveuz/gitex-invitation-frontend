@@ -31,7 +31,7 @@ const Header = ({ onLogout }) => {
         </select>
       </div>
       <div className="ml-auto flex items-center gap-3">
-        <span className="me-3">Welcome, Mohamed Belson</span>
+        {/* <span className="me-3">Welcome, Mohamed Belson</span> */}
         <button onClick={handleLogoutClick} className="flex items-center gap-1 bg-transparent border border-white px-2 py-1 rounded text-sm h-8">
           <MdLogout /> Sign Out
         </button>
