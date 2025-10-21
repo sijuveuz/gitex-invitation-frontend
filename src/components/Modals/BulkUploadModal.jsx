@@ -283,6 +283,18 @@ const BulkPersonalizedModal = ({ isOpen, onClose, onSuccess  }) => {
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    setRows([]);
+    setStats({});
+    setJobId(null);
+    setValidating(false);
+    setSearchTerm("");
+    setShowValid(false);
+    setShowInvalid(false);
+    setFilterType("");
+    setPage(1);
+    setTotalPages(1);
+
     if (file.size > 5 * 1024 * 1024)
       return MySwal.fire("Error", "File too large (max 5MB)", "error");
 
@@ -306,6 +318,7 @@ const BulkPersonalizedModal = ({ isOpen, onClose, onSuccess  }) => {
       if (res.data.status === "success") {
         const newJobId = res.data.data.job_id;
         setJobId(newJobId);
+        await fetchRowsWithFilters(1);
         pollValidation(newJobId);
         MySwal.fire("Upload Successful", "Validation started", "info");
       } else {
@@ -458,14 +471,34 @@ const BulkPersonalizedModal = ({ isOpen, onClose, onSuccess  }) => {
     }
 
   };
+
+  
   const handleClose = () => {
-    if (pollValidation.current) {
-      clearInterval(pollValidation.current);
-      pollValidation.current = null;
+    if (pollValidationRef.current) {
+      clearInterval(pollValidationRef.current);
+      pollValidationRef.current = null;
     }
+  
+    // 🧹 Reset all states
+    setRows([]);
+    setStats({});
+    setJobId(null);
     setValidating(false);
-    onClose(); // Call original
+    setUploading(false);
+    setExpireDate("");
+    setDefaultMessage("");
+    setSearchTerm("");
+    setShowValid(false);
+    setShowInvalid(false);
+    setFilterType("");
+    setPage(1);
+    setTotalPages(1);
+    setTicketTypes([]);
+    setIsAddOpen(false);
+  
+    onClose();
   };
+  
   // === Download template ===
   const downloadTemplate = () => {
     const csv = Papa.unparse([
