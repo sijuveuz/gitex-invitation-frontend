@@ -49,7 +49,7 @@ const BulkPersonalizedModal = ({ isOpen, onClose, onSuccess  }) => {
       }
     };
     fetchTicketTypes();
-  }, [token]);
+  }, [isOpen,token]);
 
   useEffect(() => {
     if (jobId && !validating) {
@@ -244,7 +244,7 @@ const BulkPersonalizedModal = ({ isOpen, onClose, onSuccess  }) => {
         >
           <option value="">Select...</option>
           {ticketTypes.map((t) => (
-            <option key={t.id} value={t.name}>{t.name}</option>
+            <option key={t.id} value={t.name}>{t.name}</option> 
           ))}
         </select>
         {errorMsg && <div className="invalid-feedback small">{errorMsg}</div>}
