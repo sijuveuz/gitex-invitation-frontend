@@ -7,34 +7,46 @@ import withReactContent from "sweetalert2-react-content";
 
 const MySwal = withReactContent(Swal);
 const API_URL = process.env.REACT_APP_API_URL;
+
 const GeneratedLinkEditModal = ({ show, id, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     guest_name: "",
+    ticket_type: "",
     usage_limit: "",
     expire_date: "",
   });
-
+  const [tickets, setTickets] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // 🧩 Fetch invitation + ticket list
   useEffect(() => {
     if (!show || !id) return;
+
     const fetchData = async () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(
-          `${API_URL}/api/invitations/dash/${id}/`,
-          { headers: { Authorization: token ? `Bearer ${token}` : "" } }
-        );
+
+        // Fetch invitation details
+        const res = await axios.get(`${API_URL}/api/invitations/dash/${id}/`, {
+          headers: { Authorization: token ? `Bearer ${token}` : "" },
+        });
 
         const d = res.data.data || {};
         setFormData({
           guest_name: d.guest_name || "",
+          ticket_type: d.ticket_type?.name || "", // adapt if ticket_type object
           usage_limit: d.usage_limit || "",
           expire_date: d.expire_date || "",
         });
+
+        // Fetch ticket list for dropdown
+        const resTickets = await axios.get(`${API_URL}/api/invitations/tickets/`, {
+          headers: { Authorization: token ? `Bearer ${token}` : "" },
+        });
+        setTickets(resTickets.data?.data || []);
       } catch (err) {
         console.error(err);
         MySwal.fire("Error", "Failed to load link details", "error");
@@ -43,10 +55,11 @@ const GeneratedLinkEditModal = ({ show, id, onClose, onSuccess }) => {
         setLoading(false);
       }
     };
+
     fetchData();
   }, [show, id]);
 
-  // 🔍 Validation logic
+  // 🧠 Validate name input
   const validateField = (name, value) => {
     let msg = "";
     if (name === "guest_name") {
@@ -58,16 +71,17 @@ const GeneratedLinkEditModal = ({ show, id, onClose, onSuccess }) => {
     setErrors((prev) => ({ ...prev, [name]: msg }));
   };
 
+  // 🔄 Handle change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     validateField(name, value);
   };
 
+  // 💾 Submit update
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Final validation before submit
     if (errors.guest_name || !formData.guest_name.trim()) {
       MySwal.fire("Validation Error", "Please fix the form errors.", "warning");
       return;
@@ -76,15 +90,25 @@ const GeneratedLinkEditModal = ({ show, id, onClose, onSuccess }) => {
     setSaving(true);
     try {
       const token = localStorage.getItem("token");
+
+      const ticketObj = tickets.find(
+        (t) => t.name === formData.ticket_type || t.id === formData.ticket_type
+      );
+
+      const payload = {
+        guest_name: formData.guest_name.trim(),
+        ticket_type: ticketObj?.id || null,
+        usage_limit: formData.usage_limit,
+        expire_date: formData.expire_date,
+      };
+
       const res = await axios.patch(
         `${API_URL}/api/invitations/${id}/edit/`,
-        {
-          guest_name: formData.guest_name,
-          expire_date: formData.expire_date,
-        },
+        payload,
         { headers: { Authorization: token ? `Bearer ${token}` : "" } }
       );
-      console.log("GENERATTED LINK EDIT :", res.data)
+
+      console.log("UPDATED LINK:", res.data);
       MySwal.fire("Success", "Link updated successfully", "success");
       onSuccess?.();
       onClose();
@@ -98,7 +122,6 @@ const GeneratedLinkEditModal = ({ show, id, onClose, onSuccess }) => {
 
   if (!show) return null;
 
-  // 🗓️ Disable past dates
   const today = new Date().toISOString().split("T")[0];
 
   return (
@@ -125,7 +148,7 @@ const GeneratedLinkEditModal = ({ show, id, onClose, onSuccess }) => {
             <div className="text-center text-gray-500 py-10">Loading...</div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4 text-sm">
-              {/* Title */}
+              {/* Name */}
               <div>
                 <label className="block font-medium text-gray-700">
                   Link Title
@@ -147,19 +170,42 @@ const GeneratedLinkEditModal = ({ show, id, onClose, onSuccess }) => {
                 )}
               </div>
 
+              {/* Ticket Type */}
+              <div>
+                <label className="block font-medium text-gray-700">
+                  Ticket Type
+                </label>
+                <select
+                  name="ticket_type"
+                  value={formData.ticket_type}
+                  onChange={handleChange}
+                  className="w-full mt-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                >
+                  <option value="">-- Select Ticket Type --</option>
+                  {tickets.map((t) => (
+                    <option key={t.id} value={t.name}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Link Limit */}
               <div>
                 <label className="block font-medium text-gray-700">
                   Link Limit
                 </label>
                 <input
-                  value={formData.usage_limit ?? ""}
-                  disabled
-                  className="w-full mt-1 border rounded px-3 py-2 bg-gray-100 cursor-not-allowed"
+                  name="usage_limit"
+                  type="number"
+                  min="1"
+                  value={formData.usage_limit}
+                  onChange={handleChange}
+                  className="w-full mt-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </div>
 
-              {/* Expiry */}
+              {/* Expiry Date */}
               <div>
                 <label className="block font-medium text-gray-700">
                   Expire Date
@@ -168,7 +214,7 @@ const GeneratedLinkEditModal = ({ show, id, onClose, onSuccess }) => {
                   type="date"
                   name="expire_date"
                   min={today}
-                  value={formData.expire_date || ""}
+                  value={formData.expire_date}
                   onChange={handleChange}
                   className="w-full mt-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />

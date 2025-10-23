@@ -160,6 +160,7 @@ const TableSection = ({
 
   const handleSuccess = () => {
     MySwal.fire("Updated!", "Changes saved successfully", "success");
+    onRefresh?.();
     handleCloseEdit();
     // optionally trigger a reload here
   };
