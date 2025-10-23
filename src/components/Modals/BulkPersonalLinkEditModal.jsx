@@ -119,19 +119,30 @@ const BulkPersonalLinkEditModal = ({ show, id, initialData = null, onClose, onSu
   // Validation
   const validateField = (name, value) => {
     let msg = "";
+    const trimmed = value?.trim() ?? "";
+  
     if (name === "guest_name") {
-      if (!/^[A-Za-z\s]*$/.test(value)) msg = "Only letters and spaces allowed.";
-      else if (value.trim().length < 2) msg = "Name must be at least 2 characters.";
+      if (trimmed && !/^[A-Za-z\s]+$/.test(trimmed))
+        msg = "Only letters and spaces allowed.";
+      else if (trimmed.length < 2)
+        msg = "Name must be at least 2 characters.";
     } else if (name === "company_name") {
-      if (!/^[A-Za-z\s]*$/.test(value)) msg = "Only letters and spaces allowed.";
-      if (value && value.trim().length < 2) msg = "Company name must be at least 2 characters.";
-    } else if (name === "expire_date") {
-      const today = new Date().toISOString().split("T")[0];
-      if (value && value < today) msg = "Expiry date cannot be in the past.";
+      // Allow letters, numbers, spaces, dots, hyphens, ampersands, commas, and parentheses
+      if (trimmed && !/^[A-Za-z0-9\s.&(),'-]+$/.test(trimmed))
+        msg = "Invalid characters in company name.";
+      else if (trimmed.length < 2)
+        msg = "Company name must be at least 2 characters.";
     }
+     else if (name === "expire_date") {
+      const today = new Date().toISOString().split("T")[0];
+      if (trimmed && trimmed < today)
+        msg = "Expiry date cannot be in the past.";
+    }
+  
     setErrors((p) => ({ ...p, [name]: msg }));
     return msg === "";
   };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -148,9 +159,9 @@ const BulkPersonalLinkEditModal = ({ show, id, initialData = null, onClose, onSu
       validateField("company_name", formData.company_name),
       validateField("expire_date", formData.expire_date),
     ];
-
+    console.log("Validation results:", validated, formData);
     if (validated.includes(false)) {
-      MySwal.fire("Validation Error", "Please fix the errors.", "warning");
+      // MySwal.fire("Validation Error", "Please fix the errors.", "warning");
       return;
     }
 
@@ -176,7 +187,7 @@ const BulkPersonalLinkEditModal = ({ show, id, initialData = null, onClose, onSu
       await axios.patch(`${API_URL}/api/invitations/${id}/edit/`, payload, {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
       });
-
+      // console.log("API response:", res.data);
       MySwal.fire("Updated!", "Invitation updated successfully", "success");
       onSuccess?.();
       onClose();
