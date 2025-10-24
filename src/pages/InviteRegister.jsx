@@ -30,6 +30,7 @@ const InviteRegister = () => {
         const res = await axios.get(
           `${API_URL}/api/invitations/link/${uuid}/`
         );
+        console.log(res.data.data)
         setInviteData(res.data.data);
       } catch (err) {
         setError("Invalid or expired invitation link.");
@@ -108,7 +109,8 @@ const InviteRegister = () => {
       navigate("/");
     } catch (err) {
       console.log(err.response)
-      const detail = err.response?.data?.detail;
+      const detail = err.response?.data?.errors?.detail;
+      console.log("ERROR2",err.response.data.errors.detail)
       setGeneralError(detail || "Registration failed.");
     } finally {
       setSubmitLoading(false);
