@@ -18,7 +18,7 @@ import PersonalizedModal from './components/Modals/PersonalizedModal';
 import BulkUploadModal from './components/Modals/BulkUploadModal';
 import InviteConfirm from './pages/InviteConfirm';
 import InviteRegister from './pages/InviteRegister';
-
+import UploadHistory from "./pages/UploadHistory";
 
 const MySwal = withReactContent(Swal); 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -178,7 +178,7 @@ const MainContent = ({
             fetchStats();
           }}
           onSuccess={() => {
-            // ✅ Refresh after success, same as PersonalizedModal
+            // ✅ Refresh after success
             fetchInvitations(currentPage, currentFilters);
             fetchStats();
           }}
@@ -370,6 +370,8 @@ function App() {
         />
         <Route path="/invite/:uuid" element={<InviteConfirm />} />
         <Route path="/invite/register/:uuid" element={<InviteRegister />} />
+        <Route path="/upload-history" element={isAuthenticated ? <UploadHistory /> : <Navigate to="/login" replace />} />
+
       </Routes>
     </Router>
   );
