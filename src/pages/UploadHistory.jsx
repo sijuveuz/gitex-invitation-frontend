@@ -8,6 +8,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 export default function UploadHistory() {
   const [jobs, setJobs] = useState([]);
+  const [latestStatus, setLatestStatus] = useState(null); // ✅ Track status separately
   const navigate = useNavigate();
 
   const loadJobs = async () => {
@@ -16,38 +17,53 @@ export default function UploadHistory() {
       const res = await axios.get(`${API_URL}/api/invitations/jobs/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setJobs(res.data?.data || res.data || []);
+      const list = res.data?.data || res.data || [];
+
+      // ✅ Sort by latest
+      const sorted = list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      setJobs(sorted);
+
+      // ✅ Track only latest job status
+      if (sorted.length > 0) {
+        setLatestStatus(sorted[0].status);
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
   useEffect(() => {
-    loadJobs(); // Initial load
+    loadJobs(); // Initial fetch
 
     const interval = setInterval(() => {
-      // Check if any job is still running
-      const hasActive = jobs.some(j =>
-        ["pending", "processing", "sending"].includes(j.status)
-      );
-
-      if (hasActive) loadJobs(); // Continue polling
+      // ✅ Poll ONLY if latest job still running
+      if (["pending", "processing", "sending"].includes(latestStatus)) {
+        loadJobs();
+      }
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [jobs]);
+  }, [latestStatus]); // ✅ Only track latest status
+
+  const activeStatus = ["pending", "processing", "sending"];
 
   const statusColor = {
     pending: "bg-gray-400",
     processing: "bg-blue-500",
     sending: "bg-purple-500",
-    completed: "bg-green-600",
-    failed: "bg-red-600",
+  };
+
+  const getProgressWidth = (status) => {
+    switch (status) {
+      case "pending": return "25%";
+      case "processing": return "55%";
+      case "sending": return "85%";
+      default: return "100%";
+    }
   };
 
   return (
     <div className="flex min-h-screen bg-gray-100" style={{ paddingTop: 48 }}>
-      {/* ✅ Add Back Button */}
       <Header
         onBack={() => navigate("/invitation")}
         onLogout={() => {
@@ -72,36 +88,46 @@ export default function UploadHistory() {
                 <th className="p-2">Status</th>
               </tr>
             </thead>
+
             <tbody>
-              {jobs.map(job => (
+              {jobs.map((job) => (
                 <tr key={job.id} className="border-b hover:bg-gray-50">
                   <td className="p-2">{job.file_name}</td>
                   <td className="p-2">{job.total_count}</td>
                   <td className="p-2 text-green-600">{job.valid_count}</td>
                   <td className="p-2 text-red-600">{job.invalid_count}</td>
+
                   <td className="p-2">
-                    <div className="w-full bg-gray-200 h-3 rounded">
-                      <div
-                        className={`h-3 rounded ${statusColor[job.status] || "bg-gray-400"}`}
-                        style={{
-                          width:
-                            job.status === "completed"
-                              ? "100%"
-                              : job.status === "sending"
-                              ? "75%"
-                              : job.status === "processing"
-                              ? "45%"
-                              : "25%",
-                        }}
-                      ></div>
-                    </div>
-                    <span className="text-xs text-gray-600">
-                      {job.status.replace("_", " ")}
-                    </span>
+                    {activeStatus.includes(job.status) ? (
+                      <>
+                        <div className="w-full bg-gray-200 h-3 rounded overflow-hidden">
+                          <div
+                            className={`h-3 rounded transition-all duration-700 ${statusColor[job.status]}`}
+                            style={{ width: getProgressWidth(job.status) }}
+                          ></div>
+                        </div>
+                        <span className="text-xs text-gray-600">
+                          {job.status.replace("_", " ")}
+                        </span>
+                      </>
+                    ) : (
+                      <span
+                        className={`px-2 py-1 text-xs rounded ${
+                          job.status === "completed"
+                            ? "bg-green-600 text-white"
+                            : job.status === "failed"
+                            ? "bg-red-600 text-white"
+                            : "bg-gray-600 text-white"
+                        }`}
+                      >
+                        {job.status.replace("_", " ")}
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))}
             </tbody>
+
           </table>
         </div>
       </main>
